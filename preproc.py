@@ -140,17 +140,6 @@ def linearacceleration(data):
 
     q_filt = LPfilter(q, fs) # LPF
 
-    # # Plot attitude
-    # plt.figure()
-    # plt.plot(q_filt[0], label='x');
-    # plt.plot(q_filt[1], label='y');
-    # plt.plot(q_filt[2], label='z');
-    # plt.plot(q_filt[3], label='w')
-    # plt.xlim(0, len(q_filt[0]) - 1)
-    # plt.title('Attitude data (x, y, z, w)')
-    # plt.xlabel('Samples')
-    # plt.legend()
-
     # User acceleration in Gs units
     UA = data['userAcceleration']
     x_accel, y_accel, z_accel = np.array([]), np.array([]), np.array([])
@@ -163,16 +152,6 @@ def linearacceleration(data):
 
     user_acceleration_filt = LPfilter(user_acceleration, fs) # LPF
 
-    # # Plot user acceleration
-    # plt.figure()
-    # plt.plot(user_acceleration_filt[0], label='x');
-    # plt.plot(user_acceleration_filt[1], label='y');
-    # plt.plot(user_acceleration_filt[2], label='z')
-    # plt.xlim(0, len(user_acceleration_filt[0]) - 1)
-    # plt.title('User acceleration')
-    # plt.xlabel('Samples')
-    # plt.legend()
-
     # Gravity in Gs units
     Grav = data['gravity']
     x_gravity, y_gravity, z_gravity = np.array([]), np.array([]), np.array([])
@@ -184,16 +163,6 @@ def linearacceleration(data):
     gravity = np.array([x_gravity, y_gravity, z_gravity])
 
     gravity_filt = LPfilter(gravity, fs) # LPF
-
-    # # Plot gravity
-    # plt.figure()
-    # plt.plot(gravity_filt[0], label='x');
-    # plt.plot(gravity_filt[1], label='y');
-    # plt.plot(gravity_filt[2], label='z')
-    # plt.xlim(0, len(gravity_filt[0]) - 1)
-    # plt.title('Gravity')
-    # plt.xlabel('Samples')
-    # plt.legend()
 
     # Convert the quaternion vector to a rotation matrix using the following formula
     xq = q[0]; yq = q[1]; zq = q[2]; wq = q[3]
@@ -214,19 +183,6 @@ def linearacceleration(data):
     # HF
     linear_acceleration_filt = HPfilter(linear_acceleration, fs)
 
-    # # Plot linear acceleration
-    # plt.figure()
-    # plt.plot(linear_acceleration_filt[0], label='x');
-    # plt.plot(linear_acceleration_filt[1], label='y');
-    # plt.plot(linear_acceleration_filt[2], label='z')
-    # plt.xlim(0, len(linear_acceleration_filt[0]) - 1)
-    # plt.title('Linear acceleration')
-    # plt.xlabel('Samples')
-    # plt.legend()
-    #
-    # # Plot all figures
-    # plt.show()
-
     # Standardize signals
     # Compute the mean and standard deviation for each axis
     linear_acceleration_filt_mean = np.mean(linear_acceleration_filt, axis=1)
@@ -236,12 +192,5 @@ def linearacceleration(data):
     linear_acceleration_filt_standardized = (linear_acceleration_filt.T - linear_acceleration_filt_mean) / linear_acceleration_filt_std
     linear_acceleration_filt_standardized = linear_acceleration_filt_standardized.T
 
-    # t = np.arange(0, linear_acceleration_filt_standardized.shape[1]) / fs
-    # plt.plot(t, linear_acceleration_filt_standardized[0])
-    # plt.plot(t, linear_acceleration_filt_standardized[1])
-    # plt.plot(t, linear_acceleration_filt_standardized[2])
-    # plt.xlabel('Time (s)')
-    # plt.ylabel('Acceleration standardized (m/s^2)')
-    # plt.show()
 
     return linear_acceleration_filt_standardized, fs, 0
