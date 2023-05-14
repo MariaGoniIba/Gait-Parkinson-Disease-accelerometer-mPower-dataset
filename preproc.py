@@ -86,7 +86,7 @@ def LPfilter(data, fs):
     # filter parameters
     nyquist = fs / 2
     fc = 20
-    
+
     # create filter coefficients
     b, a = signal.butter(4, fc / nyquist, btype='low', analog=False)
 
@@ -121,6 +121,10 @@ def linearacceleration(data):
     t_inter = t[1:] - t[0:-1]
     fs = 1 / np.mean(t_inter)
     fs = np.around(fs, -2)  # not to get decimals
+
+    # If signal less than 5 seconds, I discard it
+    if len(data) < 5*fs:
+        return 0, fs, 1  # 1 is the flag indicating less than 5 seconds
 
     # Attitude of the smartphone
     attitude = data['attitude']
@@ -240,5 +244,4 @@ def linearacceleration(data):
     # plt.ylabel('Acceleration standardized (m/s^2)')
     # plt.show()
 
-    return linear_acceleration_filt_standardized, fs
-
+    return linear_acceleration_filt_standardized, fs, 0
