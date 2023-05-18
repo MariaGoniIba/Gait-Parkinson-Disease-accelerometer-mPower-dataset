@@ -80,10 +80,6 @@ def features(acc, fs):
     iqr_x = np.percentile(acc[0], 75) - np.percentile(acc[0], 25); iqr_y = np.percentile(acc[1], 75) - np.percentile(acc[1], 25)
     iqr_z = np.percentile(acc[2], 75) - np.percentile(acc[2], 25); iqr_mag = np.percentile(mag, 75) - np.percentile(mag, 25)
 
-    # Root mean square
-    rms_x = np.sqrt(np.mean(np.square(acc[0]))); rms_y = np.sqrt(np.mean(np.square(acc[1])))
-    rms_z = np.sqrt(np.mean(np.square(acc[2]))); rms_mag = np.sqrt(np.mean(np.square(mag)))
-
     # Skewness
     skew_x = skew(acc[0]); skew_y = skew(acc[1]); skew_z = skew(acc[2]); skew_mag = skew(mag)
 
@@ -93,12 +89,12 @@ def features(acc, fs):
     # Zero-crossing rate
     # Find where the sign changes occur
     sign_changes_x = np.diff(np.sign(acc[0])); sign_changes_y = np.diff(np.sign(acc[1]))
-    sign_changes_z = np.diff(np.sign(acc[2])); sign_changes_mag = np.diff(np.sign(mag))
+    sign_changes_z = np.diff(np.sign(acc[2]));
     # Count the number of zero-crossings
     zcr_x = np.sum(sign_changes_x != 0); zcr_y = np.sum(sign_changes_y != 0)
-    zcr_z = np.sum(sign_changes_z != 0); zcr_mag = np.sum(sign_changes_mag != 0)
+    zcr_z = np.sum(sign_changes_z != 0);
     # Normalize by the signal length
-    zcr_x /= len(acc[0]); zcr_y /= len(acc[1]); zcr_z /= len(acc[2]); zcr_mag /= len(mag)
+    zcr_x /= len(acc[0]); zcr_y /= len(acc[1]); zcr_z /= len(acc[2]);
 
     ##### Frequential features #####
     # power of the whole signal
@@ -130,10 +126,9 @@ def features(acc, fs):
                              'max_x': [max_x], 'max_y': [max_y], 'max_z': [max_z],'max_mag': [max_mag],
                              'median_x': [median_x],'median_y': [median_y],'median_z': [median_z],'median_mag': [median_mag],
                              'iqr_x': [iqr_x], 'iqr_y': [iqr_y], 'iqr_z': [iqr_z], 'iqr_mag': [iqr_mag],
-                             'rms_x': [rms_x], 'rms_y': [rms_y], 'rms_z': [rms_z], 'rms_mag': [rms_mag],
                              'skew_x': [skew_x], 'skew_y': [skew_y], 'skew_z': [skew_z], 'skew_mag': [skew_mag],
                              'kurtosis_x': [kurtosis_x], 'kurtosis_y': [kurtosis_y], 'kurtosis_z': [kurtosis_z], 'kurtosis_mag': [kurtosis_mag],
-                             'zcr_x': [zcr_x], 'zcr_y': [zcr_y], 'zcr_z': [zcr_z], 'zcr_mag': [zcr_mag],
+                             'zcr_x': [zcr_x], 'zcr_y': [zcr_y], 'zcr_z': [zcr_z],
                              'power_x': [power_x],'power_y': [power_y], 'power_z': [power_z], 'power_mag': [power_mag],
                              'power_LB_x': [power_LB_x], 'power_LB_y': [power_LB_y], 'power_LB_z': [power_LB_z], 'power_LB_mag': [power_LB_mag],
                              'peak_LB_x': [peak_LB_x], 'peak_LB_y': [peak_LB_y], 'peak_LB_z': [peak_LB_z], 'peak_LB_mag': [peak_LB_mag],
