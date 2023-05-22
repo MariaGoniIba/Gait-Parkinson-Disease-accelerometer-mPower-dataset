@@ -4,7 +4,8 @@ import json
 from scipy import signal
 from scipy.signal import butter, filtfilt
 from matplotlib import pyplot as plt
-#import preproc
+import seaborn as sns
+sns.set()
 
 
 def preproc_demog(Demog_raw):
@@ -79,6 +80,52 @@ def demog_gait(Demog, Walking_raw):
 
     return Walking
 
+def onerecording(data):
+    # Function that selects the first recording per subject
+
+    data = data.sort_values(by='createdOn_y')
+    data = data.drop_duplicates(subset='healthCode', keep='first')
+    return data
+
+def matching(data):
+    # Function that match data based on age
+
+    # Exploring the PDFs
+    sns.displot(data, x="age", hue="professional-diagnosis", legend=False)
+    plt.legend(labels=["pd", "hc"])
+    plt.show()
+    sns.displot(data, x="gender", hue="professional-diagnosis", legend=False)
+    plt.legend(labels=["pd", "hc"])
+    plt.show()
+
+    ind_hc = np.where((data['professional-diagnosis'].isin([0])))
+    ind_pd = np.where((data['professional-diagnosis'].isin([1])))
+    data_hc = data.iloc[ind_hc]
+    data_pd = data.iloc[ind_pd]
+
+    # Intersection ages
+    union = np.intersect1d(data_hc['age'], data_pd['age'])
+
+    data_matched = pd.DataFrame()
+    for i, age in enumerate(union):
+        hc_temp = data_hc.loc[data_hc['age'] == age]
+        pd_temp = data_pd.loc[data_pd['age'] == age]
+        # The number of subjects to match for each age, is the minimum between the number of subjects for each of both groups
+        n_match = min(hc_temp.shape[0], pd_temp.shape[0])
+        match_temp = pd.concat([hc_temp.iloc[0:n_match], pd_temp.iloc[0:n_match]], ignore_index=True, sort=False)
+        data_matched = pd.concat([data_matched, match_temp], ignore_index=True, sort=False)
+        del hc_temp, pd_temp, n_match, match_temp
+
+    # Exploring the PDFs
+    sns.displot(data_matched, x="age", hue="professional-diagnosis", legend=False)
+    plt.legend(labels=["pd", "hc"])
+    plt.show()
+    sns.displot(data_matched, x="gender", hue="professional-diagnosis", legend=False)
+    plt.legend(labels=["pd", "hc"])
+    plt.show()
+
+    return data_matched
+
 
 def LPfilter(data, fs):
     # Butterworth low pass filter 4th order cutoff freq 20 Hz
@@ -112,6 +159,7 @@ def HPfilter(data, fs):
 
 
 def linearacceleration(data):
+    # Function to extract the linear acceleration data
 
     data = pd.DataFrame(data)
     data.head()
@@ -191,6 +239,5 @@ def linearacceleration(data):
     # Standardize the data for each axis
     linear_acceleration_filt_standardized = (linear_acceleration_filt.T - linear_acceleration_filt_mean) / linear_acceleration_filt_std
     linear_acceleration_filt_standardized = linear_acceleration_filt_standardized.T
-
 
     return linear_acceleration_filt_standardized, fs, 0
