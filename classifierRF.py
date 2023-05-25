@@ -1,26 +1,24 @@
 import pandas as pd
 import numpy as np
+import preproc  # my functions
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
-from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve
+from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix
 from matplotlib import pyplot as plt
 
 import winsound
 
-def RF(featuresGait, demo_walk):
-    featuresGait = pd.read_csv('featuresGaittemp.csv')
-    demo_walk = pd.read_csv('demo_walktemp.csv')
+def RF(featuresGait, one_rec, match):
 
-    # Normalize features
-    scaler = MinMaxScaler()
-    numeric_columns = featuresGait.select_dtypes(include=['float64', 'int64']).columns
-    scaler.fit(featuresGait[numeric_columns])
-    # Transform the features to their normalized values
-    featuresGait[numeric_columns] = scaler.transform(featuresGait[numeric_columns])
-    featuresGait = pd.DataFrame(featuresGait, columns=featuresGait.columns)
+    # Choose one recording or not depending on the user choice
+    if one_rec == 1:
+        featuresGait = preproc.onerecording(featuresGait)
 
-    featuresGait = pd.concat([demo_walk, featuresGait], axis=1)
+    # Matching or not depending on the user choice
+    if match == 1:
+        featuresGait = preproc.matching(featuresGait)
+
     feats = featuresGait.loc[:, 'MSI':]
     # Extract column names
     feature_names = feats.columns
@@ -80,11 +78,12 @@ def RF(featuresGait, demo_walk):
     y_pred = best_model.predict(X_test)
     y_pred_prob = best_model.predict_proba(X_test)[:, 1]  # Probability of positive class
 
-    # Calculate classification accuracy
+    # Calculate metrics
     accuracy = accuracy_score(y_test, y_pred)
-
-    # Calculate AUC
     auc = roc_auc_score(y_test, y_pred_prob)
+    tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
+    sensitivity = tp / (tp + fn)
+    specificity = tn / (tn + fp)
 
     # Create ROC curve
     fpr, tpr, thresholds = roc_curve(y_test, y_pred_prob)
@@ -106,19 +105,20 @@ def RF(featuresGait, demo_walk):
     importance_df = pd.DataFrame({'Feature': feature_names, 'Importance': feature_importances})
 
     # Sort the DataFrame by importance in descending order
-    importance_df = importance_df.sort_values(by='Importance', ascending=True)
+    importance_df = importance_df.sort_values(by='Importance', ascending=False)
 
     # Select the top 30 features
-    top_features = importance_df.tail(30)
+    top_features = importance_df.head(30)
 
     # Plot the feature importance for the top 30 features (upside-down)
     plt.figure(figsize=(10, 8))
     plt.barh(top_features['Feature'], top_features['Importance'])
     plt.xlabel('Importance')
     plt.ylabel('Features')
-    plt.title('Top 30 Feature Importance (Upside-down)')
+    plt.title('Top 30 Feature Importance')
     plt.gca().invert_yaxis()
     plt.tight_layout()
     plt.show()
 
-    return accuracy, auc, fpr, tpr, importance_df
+    return {'accuracy': accuracy, 'sensitivity': sensitivity, 'specificity': specificity, 'auc': auc,
+            'fpr': fpr, 'tpr': tpr, 'importance_df': importance_df}

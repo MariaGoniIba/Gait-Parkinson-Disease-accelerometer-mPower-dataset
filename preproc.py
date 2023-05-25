@@ -82,14 +82,12 @@ def demog_gait(Demog, Walking_raw):
 
 def onerecording(data):
     # Function that selects the first recording per subject
-
     data = data.sort_values(by='createdOn_y')
     data = data.drop_duplicates(subset='healthCode', keep='first')
     return data
 
 def matching(data):
     # Function that match data based on age
-
     # Exploring the PDFs
     sns.displot(data, x="age", hue="professional-diagnosis", legend=False)
     plt.legend(labels=["pd", "hc"])
@@ -160,7 +158,6 @@ def HPfilter(data, fs):
 
 def linearacceleration(data):
     # Function to extract the linear acceleration data
-
     data = pd.DataFrame(data)
     data.head()
 
