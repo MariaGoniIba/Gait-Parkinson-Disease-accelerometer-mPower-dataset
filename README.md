@@ -26,7 +26,7 @@ For experiment 3 or 4, here is the initial age and gender distribution before an
   <b>Experiment 3</b>
 </p>
 <p align="center">
-  <img width="900" src="https://github.com/MariaGoniIba/mPower/blob/main/Figures/Age%26Gender_exp3_before_after_matching.png" alt="Image">
+  <img width="900" src="https://github.com/MariaGoniIba/Gait-Parkinson-Disease-accelerometer-mPower-dataset/blob/main/Figures/Age%26Gender_exp3_before_after_match.png" alt="Image">
 </p>
 
 <p align="center">
